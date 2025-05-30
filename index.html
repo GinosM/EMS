@@ -160,7 +160,7 @@
     <label>Week (e.g. v22):
       <input type="text" id="financeWeek" placeholder="v22" required />
     </label>
-    <label>Amount (kr):
+    <label>Amount ($):
       <input type="number" id="financeAmount" placeholder="Ex: 450000" required />
     </label>
     <button class="button" type="submit">Save</button>
@@ -494,7 +494,7 @@ function renderFinanceLog() {
   financeLog.forEach(entry => {
     const li = document.createElement("li");
     li.style.marginBottom = "4px";
-    li.innerHTML = `<strong>${entry.week}</strong>: ${entry.amount.toLocaleString()} kr`;
+    li.innerHTML = `<strong>${entry.week}</strong>: ${entry.amount.toLocaleString()} $`;
     list.appendChild(li);
   });
 }
