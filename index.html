@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <meta charset="UTF-8" />
   <title>Staff Management</title>
   <style>
@@ -116,23 +117,24 @@
 <body>
 
   <div class="button-container">
-    <button class="button" onclick="toggleForm()">+ Hire Personal</button>
-    <button class="button" onclick="showTotalStaff()">Show Total Staff</button>
-    <button class="button" onclick="showTotalPaycheck()">Show Total Paycheck</button>
-    <button class="button" onclick="toggleRatesForm()">Edit Hourly Rates</button>
-    <button class="button" onclick="toggleImportForm()">Import Discord Hours</button>
+    <button class="button" onclick="toggleForm()"><i class="fas fa-user-plus" style="margin-right:6px;"></i>Hire Personal</button>
+    <button class="button" onclick="showTotalStaff()"><i class="fas fa-users" style="margin-right:6px;"></i>Show Total Staff</button>
+    <button class="button" onclick="showTotalPaycheck()"><i class="fas fa-money-bill-wave" style="margin-right:6px;"></i>Show Total Paycheck</button>
+    <button class="button" onclick="toggleRatesForm()"><i class="fas fa-pen-to-square" style="margin-right:6px;"></i>Edit Hourly Rates</button>
+    <button class="button" onclick="toggleImportForm()"><i class="fas fa-file-import" style="margin-right:6px;"></i>Import Discord Hours</button>
+<button class="button" onclick="toggleFinanceLog()"><i class="fas fa-calendar-week" style="margin-right:6px;"></i>Weekly Financial Log</button>
   </div>
 
   <div id="ratesContainer" class="form-container">
-    <h2>Edit Hourly Rates</h2>
+    <h2><i class="fas fa-pen-to-square" style="margin-right:6px;"></i>Edit Hourly Rates</h2>
     <form id="ratesForm"></form>
     <button class="button" onclick="saveRates(event)">Save Rates</button>
   </div>
 
   <div id="importContainer" class="form-container" style="max-width: 500px;">
-    <h3>Import Discord Hours</h3>
+    <h3><i class="fas fa-file-import" style="margin-right:6px;"></i>Import Discord Hours</h3>
     <textarea id="importHours" rows="6" cols="40" placeholder="Name:"></textarea><br />
-    <button class="button" onclick="importDiscordHours()">Import Discord Hours</button>
+    <button class="button" onclick="importDiscordHours()"><i class="fas fa-file-import" style="margin-right:6px;"></i>Import Discord Hours</button>
     <button class="button" style="background-color:#888; margin-left:10px;" onclick="toggleImportForm()">Close</button>
   </div>
 
@@ -150,6 +152,22 @@
       <button class="button" type="submit">Add Staff</button>
     </form>
   </div>
+
+  
+<div id="financeContainer" class="form-container" style="display: none; max-width: 500px;">
+  <h2><i class="fas fa-calendar-week" style="margin-right:6px;"></i>Weekly Financial Log</h2>
+  <form onsubmit="addFinanceLog(event)">
+    <label>Week (e.g. v22):
+      <input type="text" id="financeWeek" placeholder="v22" required />
+    </label>
+    <label>Amount (kr):
+      <input type="number" id="financeAmount" placeholder="Ex: 450000" required />
+    </label>
+    <button class="button" type="submit">Save</button>
+  </form>
+  <ul id="financeLogList" style="margin-top: 1rem; padding-left: 0; list-style: none;"></ul>
+</div>
+
 
   <h2>Staff List</h2>
 
@@ -456,10 +474,59 @@
   }
 
   window.onload = () => {
+  renderFinanceLog();
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('hireDate').value = today;
     renderTable();
   };
+
+// FINANCIAL LOG - LocalStorage-baserad logg
+let financeLog = JSON.parse(localStorage.getItem("financeLog")) || [];
+
+function renderFinanceLog() {
+  const list = document.getElementById("financeLogList");
+  list.innerHTML = "";
+  if (financeLog.length === 0) {
+    list.innerHTML = "<li style='color:#777;'>No logs yet.</li>";
+    return;
+  }
+
+  financeLog.forEach(entry => {
+    const li = document.createElement("li");
+    li.style.marginBottom = "4px";
+    li.innerHTML = `<strong>${entry.week}</strong>: ${entry.amount.toLocaleString()} kr`;
+    list.appendChild(li);
+  });
+}
+
+
+function addFinanceLog(e) {
+  e.preventDefault();
+  const week = document.getElementById("financeWeek").value.trim();
+  const amount = parseFloat(document.getElementById("financeAmount").value);
+  if (!week || isNaN(amount)) return;
+
+  financeLog.push({ week, amount });
+  localStorage.setItem("financeLog", JSON.stringify(financeLog));
+
+  document.getElementById("financeWeek").value = "";
+  document.getElementById("financeAmount").value = "";
+
+  renderFinanceLog();
+
+  // Stäng formuläret efter spara
+  document.getElementById("financeContainer").style.display = "none";
+}
+
+
+
+
+function toggleFinanceLog() {
+  const container = document.getElementById('financeContainer');
+  container.style.display = container.style.display === 'none' ? 'block' : 'none';
+}
+
+
 </script>
 </body>
 </html>
